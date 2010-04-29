@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/revisions.rb",
+     "revisions.gemspec",
      "test/helper.rb",
      "test/models.rb",
      "test/schema.rb",
