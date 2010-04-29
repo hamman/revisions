@@ -1,17 +1,103 @@
 = revisions
 
-Description goes here.
+Revisions provides a simple, wordpress-like, interface for tracking revisions to a model within a single table. It's a bit rudimentary now, but I hope to add to it as necessary.
 
-== Note on Patches/Pull Requests
- 
-* Fork the project.
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for topic branches.
+The basics:
+* Stores drafts, published items, and revisions
+* 
 
-== Copyright
+== INSTALLATION
 
-Copyright (c) 2010 Rajkumar. See LICENSE for details.
+	sudo gem install revisions --source http://gemcutter.org
+
+then add to environment.rb
+	
+	config.gem 'revisions', :source => 'http://gemcutter.org'
+
+
+== USAGE
+
+The gem is a bit rigid at the moment, so you'll need to setup two columns for it to use:
+
+	t.string 	:status			# draft, published, revision	
+	t.integer 	:revision_of	# Foreign Key that tracks what a model is revising.
+
+You may also want to index these fields.
+
+Once your models are setup, need to declare revisions within any model you intend to track. ie.
+
+	class Response < ActiveRecord::Base
+		has_revisions
+	end
+
+You can also declare variables that you DON'T want to track (like a slug that has to be unique on the table, publication date, etc.)
+
+	class Response < ActiveRecord::Base
+		has_revisions :ignore => ['published_at', 'slug']
+	end
+
+In addition to the variables you declare, revisions will ignore the status, id, revision_of, and created_at fields.
+
+Now you're all set to save and apply revisions. Revisions exposes three methods: latest_revision, pending_revisions?, save_revision and apply_revision.
+
+latest_revision:
+* returns the latest revision
+
+pending_revisions:
+* returns true if there are revisions with a more recent updated_at than the model.
+
+save_revision:
+* If your model is a draft, it simply saves the model.
+* If your model is published, it saves a revision (does not modify the core model)
+* OG model doesn't change, so all associations are intact
+* Behaves like standard ActiveRecord save (ie. returns true/false if it saves succesfully and creates an errors array if not)
+* can be called with bang (save_revision!) to throw an exception if it doesn't save.
+
+apply_revision
+* If called without params, maps the latest revision onto the model, but DOES NOT SAVE.
+* If called with a revision, maps that revision, but doesn't save
+* if called with bang (apply_revision!), maps a revision AND saves
+
+How about some examples.
+
+Saving a Revision:
+
+	response = Response.create({:title => 'donkey', :status => 'published'})
+	response.title = 'monkey'
+	response.save_revision						# => true
+	response.revisions.size						# => 1
+	response.pending_revision?					# => true
+
+save_revision doesn't affect the original response
+
+	response.reload
+	revision = response.latest_revision		# => new response object.
+	response.title									# => 'donkey'
+	revision.title									# => 'monkey'
+
+apply_revision will affect the original response
+
+	response.apply_revision						# => true
+	response.title									# => 'monkey'
+
+
+
+==Final Suggestion
+
+Since revisions all live within the same table, you probably want to setup a default scope on your model so you don't access revisions directly.
+
+	default_scope :conditions => "status <> 'revision'"
+
+
+== LIMITATIONS
+
+There are a few things on the to-do list, among them:
+
+* There's no way to prune revisions yet. But that's coming ASAP.
+* Revisions assumes your model uses a standard rails Table Name (ie Response => Responses)
+* Revisions requires the status and revision_of columns (for now) 
+
+
+==Author
+	
+Brian Hamman, hamman+github [ @ ] gmail.com
