@@ -47,8 +47,7 @@ pending_revisions:
 * returns true if there are revisions with a more recent updated_at than the model.
 
 save_revision:
-* If your model is a draft, it simply saves the model.
-* If your model is published, it saves a revision (does not modify the core model)
+* Saves a copy of your model (a revision) in the same table
 * OG model doesn't change, so all associations are intact
 * Behaves like standard ActiveRecord save (ie. returns true/false if it saves succesfully and creates an errors array if not)
 * can be called with bang (save_revision!) to throw an exception if it doesn't save.
@@ -79,15 +78,6 @@ apply_revision will affect the original response
 
 	response.apply_revision						# => true
 	response.title									# => 'monkey'
-
-
-
-==Final Suggestion
-
-Since revisions all live within the same table, you probably want to setup a default scope on your model so you don't access revisions directly.
-
-	default_scope :conditions => "status <> 'revision'"
-
 
 == LIMITATIONS
 

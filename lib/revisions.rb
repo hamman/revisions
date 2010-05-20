@@ -37,23 +37,19 @@ module Revisions
     end
 
     def save_revision
-      if self.published?
-        new_copy = self.clone
-        attributes_to_nil = {}
-        self.unrevised_attributes.each {|a| attributes_to_nil[a] = nil }
-        new_copy.attributes=attributes_to_nil
-        new_copy.created_at = new_copy.updated_at = Time.zone.now
-        new_copy.status = 'revision'
-        new_copy.revision_of = self.id
-        if new_copy.save
-          true
-        else
-          new_copy.errors.each {|attribute,message| self.errors.add(attribute,message)} 
-          false
-        end
+      new_copy = self.clone
+      attributes_to_nil = {}
+      self.unrevised_attributes.each {|a| attributes_to_nil[a] = nil }
+      new_copy.attributes=attributes_to_nil
+      new_copy.created_at = new_copy.updated_at = Time.zone.now
+      new_copy.status = 'revision'
+      new_copy.revision_of = self.id
+      if new_copy.save
+        true
       else
-        save
-      end     
+        new_copy.errors.each {|attribute,message| self.errors.add(attribute,message)} 
+        false
+      end   
     end
 
     def save_revision!

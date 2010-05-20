@@ -26,11 +26,12 @@ class TestRevisions < Test::Unit::TestCase
         end
       end
       
-      should "just save to the same record when in draft mode" do
+      should "save a revision even in draft mode" do
         @response.revisions.delete_all
         @response.status = 'draft'
         assert @response.save_revision
-        assert_equal 0, @response.revisions.size
+        @response.reload
+        assert_equal 1, @response.revisions.size
       end
     
       should "save a revision that copies all fields" do
