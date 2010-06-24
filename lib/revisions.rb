@@ -14,7 +14,7 @@ module Revisions
       include InstanceMethods
       
       self.unrevised_attributes = opts[:ignore] || []
-      self.unrevised_attributes.concat ['revision_of', 'status', 'created_at']
+      self.unrevised_attributes.concat ['revision_of', 'status', 'created_at', 'updated_at', 'id']
     end
   
   end
@@ -68,7 +68,7 @@ module Revisions
     def apply_revision(revision=nil)
       revision = latest_revision if revision.nil?
       unless revision.nil?
-        revised_attributes = revision.attributes.reject {|k,v| self.unrevised_attributes.include?(k) || k == 'id'}
+        revised_attributes = revision.attributes.reject {|k,v| self.unrevised_attributes.include?(k)}
         self.attributes=revised_attributes
         return true
       end
