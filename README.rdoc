@@ -87,6 +87,12 @@ There are a few things on the to-do list, among them:
 * Revisions assumes your model uses a standard rails Table Name (ie Response => Responses)
 * Revisions requires the status and revision_of columns (for now) 
 
+== RELEASE NOTES
+
+0.1.1
+ - Added updated_at to unrevised attributes to fix a bug in pending_revisions? on a revision.
+
+
 
 ==Author
 	
