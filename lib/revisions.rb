@@ -4,7 +4,7 @@ module Revisions
     STATUSES = ['draft', 'published', 'revision']
       
     def has_revisions opts={}
-      class_inheritable_accessor :unrevised_attributes
+      class_attribute :unrevised_attributes
       
       has_many :revisions,  
         :class_name => self.name, 
@@ -37,7 +37,7 @@ module Revisions
     end
 
     def save_revision
-      new_copy = self.clone
+      new_copy = self.dup
       attributes_to_nil = {}
       self.unrevised_attributes.each {|a| attributes_to_nil[a] = nil }
       new_copy.attributes=attributes_to_nil
@@ -47,7 +47,7 @@ module Revisions
       if new_copy.save
         true
       else
-        new_copy.errors.each {|attribute,message| self.errors.add(attribute,message)} 
+        new_copy.errors.each {|attribute,message| self.errors[attribute] = message} 
         false
       end   
     end
