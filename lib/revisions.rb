@@ -44,6 +44,7 @@ module Revisions
       new_copy.created_at = new_copy.updated_at = Time.zone.now
       new_copy.status = 'revision'
       new_copy.revision_of = self.id
+      new_copy.id = nil # makes it compatible with rails 3.0, which dupes the id.
       if new_copy.save
         true
       else

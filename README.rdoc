@@ -92,6 +92,8 @@ There are a few things on the to-do list, among them:
 0.1.1
  - Added updated_at to unrevised attributes to fix a bug in pending_revisions? on a revision.
 
+0.3.1
+ - Added support for Rails 3.0 and 3.1
 
 
 ==Author
