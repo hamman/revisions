@@ -48,7 +48,7 @@ module Revisions
       if new_copy.save
         true
       else
-        new_copy.errors.each {|attribute,message| self.errors[attribute] = message} 
+        new_copy.errors.each {|attribute,message| self.errors[attribute] << message} 
         false
       end   
     end
