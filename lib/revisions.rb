@@ -37,18 +37,20 @@ module Revisions
     end
 
     def save_revision
-      new_copy = self.dup
-      attributes_to_nil = {}
-      self.unrevised_attributes.each {|a| attributes_to_nil[a] = nil }
-      new_copy.attributes=attributes_to_nil
+      new_copy = self.class.new
+      cloned_attributes = self.clone_attributes
+      self.unrevised_attributes.each {|a| cloned_attributes.delete(a) }
+      new_copy.attributes=cloned_attributes
       new_copy.created_at = new_copy.updated_at = Time.zone.now
       new_copy.status = 'revision'
       new_copy.revision_of = self.id
-      new_copy.id = nil # makes it compatible with rails 3.0, which dupes the id.
       if new_copy.save
         true
       else
-        new_copy.errors.each {|attribute,message| self.errors[attribute] << message} 
+        self.errors.clear
+        new_copy.errors.each do |attribute,message| 
+          self.errors[attribute] << message
+        end
         false
       end   
     end
